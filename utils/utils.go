@@ -18,6 +18,7 @@ func LessThanExist[T int | uint](elems []T, from, to T) bool {
 	return false
 }
 
+// FindFirstBreakPoint finds a item that does not have any element between itself and a multiple of 2 * item.
 func FindFirstBreakPoint[T int | uint](elems []T) (index int) {
 	for i, elem := range elems {
 		if !LessThanExist(elems, elem, elem*2) {

@@ -61,6 +61,9 @@ func (s *HTTPServer) CalculatePacksHandler(w http.ResponseWriter, r *http.Reques
 // StartServer starts new http server
 func StartServer(cfg *config.Config) {
 	server := NewHttpServer(packer.NewDefaultPackageCalculator(cfg.PacketSizes))
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "frontend/index.html")
+	})
 	http.HandleFunc("/calculate-packs", server.CalculatePacksHandler)
 	http.HandleFunc("/update-pack-sizes", server.UpdatePackSizesHandler)
 	fmt.Printf("Server listening on port %d...\n", cfg.HTTPPort)

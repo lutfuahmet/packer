@@ -63,21 +63,47 @@ func CalculatePacksWithPackSizes(packSizes []uint, itemQuantity uint) map[uint]u
 				minDifference = int(difference)
 			}
 		}
-		// Update pack counts
-		packCounts[bestSize]++
+
 		// optimize pack sizes
+
+		firstBreakPointIndex := utils.FindFirstBreakPoint(packSizes)
+		var firstBreakPoint uint
+		if firstBreakPointIndex > -1 {
+			firstBreakPoint = packSizes[firstBreakPointIndex]
+		} else {
+			firstBreakPoint = bestSize
+		}
+
+		if bestSize != firstBreakPoint && firstBreakPointIndex > 0 {
+			maxLess := packSizes[firstBreakPointIndex-1] // largest number smaller than first break point
+			if itemQuantity <= (firstBreakPoint - maxLess) {
+				packCounts[firstBreakPoint]++
+				packCounts[maxLess]--
+			}
+		} else {
+			// Update pack counts
+			packCounts[bestSize]++
+		}
+
 		for _, size := range packSizes {
 			count := packCounts[size]
 			if count == 0 {
 				continue
 			}
 			itemCount := count * size
-			if utils.Contains(packSizes, itemCount) {
+			if count > 1 && utils.Contains(packSizes, itemCount) {
 				delete(packCounts, size)
 				packCounts[itemCount]++
 			}
 		}
-
+		newPackCount := map[uint]uint{}
+		// delete 0 values
+		for size, count := range packCounts {
+			if count > 0 {
+				newPackCount[size] = count
+			}
+		}
+		packCounts = newPackCount
 	}
 
 	return packCounts
