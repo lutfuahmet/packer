@@ -52,6 +52,13 @@ func TestCalculatePacksWithPackSizes(t *testing.T) {
 				1000: 1,
 			},
 		},
+		{
+			name: "test6",
+			args: args{itemQuantity: 3758},
+			want: map[uint]uint{
+				2000: 2,
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
