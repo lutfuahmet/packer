@@ -1,6 +1,7 @@
 package packer
 
 import (
+	"log"
 	"math"
 	"packer/utils"
 	"sort"
@@ -31,6 +32,7 @@ func (p *DefaultPackageCalculator) CalculatePacks(itemQuantity uint) map[uint]ui
 
 // CalculatePacksWithPackSizes calculates the required number of packs for a given item quantity and packSizes
 func CalculatePacksWithPackSizes(packSizes []uint, itemQuantity uint) map[uint]uint {
+	baseItemQuantity := itemQuantity
 	if len(packSizes) == 0 {
 		return nil
 	}
@@ -79,6 +81,29 @@ func CalculatePacksWithPackSizes(packSizes []uint, itemQuantity uint) map[uint]u
 			if itemQuantity <= (firstBreakPoint - maxLess) {
 				packCounts[firstBreakPoint]++
 				packCounts[maxLess]--
+			} else {
+				packCounts[bestSize]++
+				prevIndex := firstBreakPointIndex - 1
+				partialTotal := GetPartialTotal(packCounts, firstBreakPoint)
+
+				for {
+					newPackCounts := packCounts
+					newPackCounts[firstBreakPoint]--
+					prevPackageSize := packSizes[prevIndex]
+					prevIndex--
+					newPackCounts[prevPackageSize]++
+					newPartialTotal := GetPartialTotal(newPackCounts, firstBreakPoint)
+					log.Println(newPartialTotal)
+					if newPartialTotal < baseItemQuantity {
+						break
+					}
+					packCounts = newPackCounts
+					if prevIndex < 0 {
+						break
+					}
+				}
+
+				log.Println(partialTotal)
 			}
 		} else {
 			// Update pack counts
@@ -107,4 +132,15 @@ func CalculatePacksWithPackSizes(packSizes []uint, itemQuantity uint) map[uint]u
 	}
 
 	return packCounts
+}
+
+func GetPartialTotal(packCounts map[uint]uint, maxSize uint) uint {
+	var total uint
+	for size, count := range packCounts {
+		if size > maxSize {
+			return total
+		}
+		total += size * count
+	}
+	return total
 }

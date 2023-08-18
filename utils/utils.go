@@ -27,3 +27,12 @@ func FindFirstBreakPoint[T int | uint](elems []T) (index int) {
 	}
 	return -1
 }
+
+func GetIndexByValue[T comparable](elems []T, value T) int {
+	for i, s := range elems {
+		if s == value {
+			return i
+		}
+	}
+	return -1
+}
